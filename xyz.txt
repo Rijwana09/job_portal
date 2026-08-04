@@ -1,3 +1,19 @@
+client/src/
+
+components/
+
+├── Common/
+│     Button.jsx
+│     Card.jsx
+│     Container.jsx
+│     EmptyState.jsx
+│     Skeleton.jsx
+│
+└── Error/
+      ErrorBoundary.jsx
+
+
+
 {
   "name": "server",
   "version": "1.0.0", 

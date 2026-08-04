@@ -1,22 +1,16 @@
-// import { useEffect } from "react";
-// import API from "../../services/axios";
-
-// useEffect(() => {
-//   API.get("/health")
-//     .then((res) => console.log(res.data))
-//     .catch(console.error);
-// }, []);
+import Hero from "../../components/Home/Hero";
+import Features from "../../components/Home/Features";
+import Stats from "../../components/Home/Stats";
+import CTA from "../../components/Home/CTA";
+import PageWrapper from "../../components/Common/PageWrapper";
 
 export default function Home() {
   return (
-    <div className="flex h-screen items-center justify-center">
-
-      <h1 className="text-5xl font-bold">
-
-        MERN Job Portal
-
-      </h1>
-
-    </div>
+    <PageWrapper>
+      <Hero />
+      <Features />
+      <Stats />
+      <CTA />
+    </PageWrapper>
   );
 }

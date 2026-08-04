@@ -9,21 +9,27 @@ import { Toaster } from "react-hot-toast";
 
 import { ThemeProvider } from "./context/ThemeContext";
 
+import ErrorBoundary from "./components/Error/ErrorBoundary";
+
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
   <React.StrictMode>
 
-    <ThemeProvider>
+    <ErrorBoundary>
 
-      <App />
+      <ThemeProvider>
 
-      <Toaster
-        position="top-right"
-        reverseOrder={false}
-      />
+        <App />
 
-    </ThemeProvider>
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+        />
+
+      </ThemeProvider>
+
+    </ErrorBoundary>
 
   </React.StrictMode>
 );

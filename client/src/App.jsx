@@ -1,36 +1,30 @@
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
 } from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout";
 
 import Home from "./pages/Home/Home";
 import NotFound from "./pages/NotFound";
 
-import MainLayout from "./layouts/MainLayout";
-
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-
         <Route element={<MainLayout />}>
-
           <Route
             path="/"
             element={<Home />}
           />
-
         </Route>
 
         <Route
           path="*"
           element={<NotFound />}
         />
-
       </Routes>
-
     </BrowserRouter>
   );
 }
