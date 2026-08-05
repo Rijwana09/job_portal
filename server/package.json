@@ -1,7 +1,7 @@
 {
   "name": "job-portal-server",
   "version": "1.0.0",
-  "type" : "module",
+  "type": "module",
   "description": "Backend API for MERN Job Portal",
   "main": "src/server.js",
   "scripts": {
@@ -31,12 +31,10 @@
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.5"
+    "nodemailer": "^7.0.5",
+    "validator": "^13.15.35"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
   }
 }
-
-
-
