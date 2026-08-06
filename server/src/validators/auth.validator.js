@@ -122,6 +122,21 @@ export const resetPasswordValidation = [
     }),
 ];
 
+
+  /*
+|--------------------------------------------------------------------------
+| Verify Email Validation
+|--------------------------------------------------------------------------
+*/
+
+  export const verifyEmailValidation = [
+    body("token")
+      .trim()
+      .notEmpty()
+      .withMessage("Verification token is required")
+      .isString()
+      .withMessage("Verification token must be a string"),
+];
 /*
 |--------------------------------------------------------------------------
 | Update Profile Validation
