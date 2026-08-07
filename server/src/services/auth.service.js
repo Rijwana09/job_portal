@@ -179,6 +179,170 @@ class AuthService {
   }
 
   /*
+|--------------------------------------------------------------------------
+| Resend Verification Email
+|--------------------------------------------------------------------------
+*/
+
+async resendVerificationEmail(email) {
+  const genericMessage =
+    "If an unverified account with that email exists, a verification email has been sent.";
+
+  const user = await User.findOne({ email });
+
+  /*
+  |--------------------------------------------------------------------------
+  | Prevent Email Enumeration
+  |--------------------------------------------------------------------------
+  */
+
+  if (!user) {
+    return {
+      message: genericMessage,
+    };
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Already Verified
+  |--------------------------------------------------------------------------
+  */
+
+  if (user.isVerified) {
+    return {
+      message: genericMessage,
+    };
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generate New Verification Token
+  |--------------------------------------------------------------------------
+  */
+
+  const { token, hashedToken } =
+    generateSecureToken();
+
+  user.verificationToken = hashedToken;
+
+  user.verificationTokenExpiresAt =
+    new Date(
+      Date.now() + 24 * 60 * 60 * 1000
+    );
+
+  await user.save();
+
+  /*
+  |--------------------------------------------------------------------------
+  | Build Verification URL
+  |--------------------------------------------------------------------------
+  */
+
+  const verificationUrl =
+    `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Send Verification Email
+  |--------------------------------------------------------------------------
+  */
+
+  try {
+    await emailService.sendVerificationEmail({
+      email: user.email,
+      name: user.name,
+      verificationUrl,
+    });
+  } catch (error) {
+    /*
+    |--------------------------------------------------------------------------
+    | Roll Back Token If Email Fails
+    |--------------------------------------------------------------------------
+    */
+
+    user.verificationToken = null;
+    user.verificationTokenExpiresAt = null;
+
+    await user.save();
+
+    throw error;
+  }
+
+  return {
+    message: genericMessage,
+  };
+}
+
+  /*
+|--------------------------------------------------------------------------
+| Forgot Password
+|--------------------------------------------------------------------------
+*/
+
+async forgotPassword(email) {
+  const user = await User.findOne({ email });
+
+  /*
+  |--------------------------------------------------------------------------
+  | Prevent Email Enumeration
+  |--------------------------------------------------------------------------
+  */
+
+  if (!user) {
+    return {
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    };
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generate Secure Reset Token
+  |--------------------------------------------------------------------------
+  */
+
+  const { token, hashedToken } =
+    generateSecureToken();
+
+  user.passwordResetToken = hashedToken;
+
+  user.passwordResetTokenExpiresAt =
+    new Date(
+      Date.now() + 60 * 60 * 1000
+    );
+
+  await user.save();
+
+  /*
+  |--------------------------------------------------------------------------
+  | Build Reset URL
+  |--------------------------------------------------------------------------
+  */
+
+  const resetUrl =
+    `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Send Email
+  |--------------------------------------------------------------------------
+  */
+
+  await emailService.sendForgotPasswordEmail({
+    email: user.email,
+    name: user.name,
+    resetUrl,
+  });
+
+  return {
+    message:
+      "If an account with that email exists, a password reset link has been sent.",
+  };
+}
+
+
+
+  /*
   |--------------------------------------------------------------------------
   | Refresh Access Token
   |--------------------------------------------------------------------------
@@ -230,6 +394,76 @@ class AuthService {
       refreshToken: newRefreshToken,
     };
   }
+
+   /*
+|--------------------------------------------------------------------------
+| Reset Password
+|--------------------------------------------------------------------------
+*/
+
+async resetPassword(token, newPassword) {
+  if (!token) {
+    throw new ApiError(
+      400,
+      "Password reset token is required"
+    );
+  }
+
+  const hashedToken = hashToken(token);
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpiresAt: {
+      $gt: new Date(),
+    },
+  }).select(
+    "+passwordResetToken +password"
+  );
+
+  if (!user) {
+    throw new ApiError(
+      400,
+      "Invalid or expired password reset token"
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Update Password
+  |--------------------------------------------------------------------------
+  */
+
+  user.password = newPassword;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Clear Password Reset Token
+  |--------------------------------------------------------------------------
+  */
+
+  user.passwordResetToken = null;
+  user.passwordResetTokenExpiresAt = null;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Invalidate Existing Refresh Token
+  |--------------------------------------------------------------------------
+  |
+  | This prevents an old session from continuing to refresh
+  | access tokens after the password has been changed.
+  |
+  */
+
+  user.refreshToken = null;
+  user.refreshTokenExpiresAt = null;
+
+  await user.save();
+
+  return {
+    id: user._id,
+    email: user.email,
+  };
+}
 
   /*
   |--------------------------------------------------------------------------

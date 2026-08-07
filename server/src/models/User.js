@@ -45,8 +45,37 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    verificationToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    verificationTokenExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+
     refreshToken: {
       type: String,
+      default: null,
+      select: false,
+    },
+
+    refreshTokenExpiresAt: {
+      type: Date,
+      default: null,
+    },
+
+    passwordResetToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    passwordResetTokenExpiresAt: {
+      type: Date,
       default: null,
       select: false,
     },

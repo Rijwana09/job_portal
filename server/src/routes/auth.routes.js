@@ -9,6 +9,9 @@ import {
   registerValidation,
   loginValidation,
   verifyEmailValidation,
+  resendVerificationEmailValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
 } from "../validators/auth.validator.js";
 
 const router = express.Router();
@@ -38,6 +41,27 @@ router.post(
   verifyEmailValidation,
   validate,
   authController.verifyEmail
+);
+
+router.post(
+  "/resend-verification",
+  resendVerificationEmailValidation,
+  validate,
+  authController.resendVerificationEmail
+);
+
+router.post(
+  "/forgot-password",
+  forgotPasswordValidation,
+  validate,
+  authController.forgotPassword
+);
+
+router.post(
+  "/reset-password",
+  resetPasswordValidation,
+  validate,
+  authController.resetPassword
 );
 
 router.post(

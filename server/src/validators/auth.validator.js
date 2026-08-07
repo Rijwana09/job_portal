@@ -95,29 +95,29 @@ export const forgotPasswordValidation = [
 */
 
 export const resetPasswordValidation = [
-  body("password")
+  body("token")
+    .trim()
     .notEmpty()
-    .withMessage("Password is required")
+    .withMessage("Password reset token is required")
+    .isString()
+    .withMessage("Password reset token must be a string"),
+
+  body("password")
+    .isString()
+    .withMessage("Password must be a string")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
-    .matches(/[A-Z]/)
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[a-z]/)
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/[0-9]/)
-    .withMessage("Password must contain at least one number")
-    .matches(/[@$!%*?&#^()_\-+=]/)
-    .withMessage(
-      "Password must contain at least one special character"
-    ),
+    .isLength({ max: 128 })
+    .withMessage("Password cannot exceed 128 characters"),
 
   body("confirmPassword")
-    .notEmpty()
-    .withMessage("Confirm Password is required")
+    .isString()
+    .withMessage("Confirm password must be a string")
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Passwords do not match");
       }
+
       return true;
     }),
 ];
@@ -137,6 +137,23 @@ export const resetPasswordValidation = [
       .isString()
       .withMessage("Verification token must be a string"),
 ];
+
+  /*
+|--------------------------------------------------------------------------
+| Resend Verification Email Validation
+|--------------------------------------------------------------------------
+*/
+
+export const resendVerificationEmailValidation = [
+  body("email")
+    .trim()
+    .normalizeEmail()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Please provide a valid email address"),
+];
+
 /*
 |--------------------------------------------------------------------------
 | Update Profile Validation

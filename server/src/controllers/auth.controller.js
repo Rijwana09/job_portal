@@ -73,6 +73,71 @@ class AuthController {
     );
   });
 
+
+   /*
+ |--------------------------------------------------------------------------
+ | Resend Verification Email
+ |--------------------------------------------------------------------------
+ */
+
+resendVerificationEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const result =
+    await authService.resendVerificationEmail(email);
+
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: result.message,
+    })
+  );
+});
+
+    /*
+|--------------------------------------------------------------------------
+| Forgot Password
+|--------------------------------------------------------------------------
+*/
+
+forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const result =
+    await authService.forgotPassword(email);
+
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: result.message,
+    })
+  );
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Reset Password
+|--------------------------------------------------------------------------
+*/
+
+resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body;
+
+  const user = await authService.resetPassword(
+    token,
+    password
+  );
+
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Password reset successfully",
+      data: user,
+    })
+  );
+});
+
   /*
   |--------------------------------------------------------------------------
   | Refresh Access Token
@@ -104,6 +169,8 @@ class AuthController {
       })
     );
   });
+
+    
 
   /*
   |--------------------------------------------------------------------------
