@@ -139,6 +139,33 @@ resetPassword = asyncHandler(async (req, res) => {
 });
 
   /*
+|--------------------------------------------------------------------------
+| Change Password
+|--------------------------------------------------------------------------
+*/
+
+changePassword = asyncHandler(async (req, res) => {
+  const {
+    currentPassword,
+    newPassword,
+  } = req.body;
+
+  const user = await authService.changePassword(
+    req.user._id,
+    currentPassword,
+    newPassword
+  );
+
+  return res.status(200).json(
+    new ApiResponse({
+      statusCode: 200,
+      message: "Password changed successfully",
+      data: user,
+    })
+  );
+});
+
+  /*
   |--------------------------------------------------------------------------
   | Refresh Access Token
   |--------------------------------------------------------------------------

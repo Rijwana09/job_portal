@@ -12,6 +12,7 @@ import {
   resendVerificationEmailValidation,
   forgotPasswordValidation,
   resetPasswordValidation,
+  changePasswordValidation,
 } from "../validators/auth.validator.js";
 
 const router = express.Router();
@@ -62,6 +63,14 @@ router.post(
   resetPasswordValidation,
   validate,
   authController.resetPassword
+);
+
+router.patch(
+  "/change-password",
+  protect,
+  changePasswordValidation,
+  validate,
+  authController.changePassword
 );
 
 router.post(

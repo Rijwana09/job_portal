@@ -465,6 +465,89 @@ async resetPassword(token, newPassword) {
   };
 }
 
+/*
+|--------------------------------------------------------------------------
+| Change Password
+|--------------------------------------------------------------------------
+*/
+
+async changePassword(userId, currentPassword, newPassword) {
+  if (!userId) {
+    throw new ApiError(
+      401,
+      "Authentication required"
+    );
+  }
+
+  const user = await User.findById(userId).select(
+    "+password +refreshToken"
+  );
+
+  if (!user) {
+    throw new ApiError(
+      404,
+      "User not found"
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Verify Current Password
+  |--------------------------------------------------------------------------
+  */
+
+  const isCurrentPasswordCorrect =
+    await user.comparePassword(currentPassword);
+
+  if (!isCurrentPasswordCorrect) {
+    throw new ApiError(
+      400,
+      "Current password is incorrect"
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Prevent Same Password
+  |--------------------------------------------------------------------------
+  */
+
+  const isSamePassword =
+    await user.comparePassword(newPassword);
+
+  if (isSamePassword) {
+    throw new ApiError(
+      400,
+      "New password must be different from current password"
+    );
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Update Password
+  |--------------------------------------------------------------------------
+  */
+
+  user.password = newPassword;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Invalidate Refresh Token
+  |--------------------------------------------------------------------------
+  */
+
+  user.refreshToken = null;
+  user.refreshTokenExpiresAt = null;
+
+  await user.save();
+
+  return {
+    id: user._id,
+    email: user.email,
+  };
+}
+
+
   /*
   |--------------------------------------------------------------------------
   | Logout

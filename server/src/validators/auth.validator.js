@@ -122,6 +122,45 @@ export const resetPasswordValidation = [
     }),
 ];
 
+  /*
+|--------------------------------------------------------------------------
+| Change Password Validation
+|--------------------------------------------------------------------------
+*/
+
+export const changePasswordValidation = [
+  body("currentPassword")
+    .isString()
+    .withMessage("Current password must be a string")
+    .notEmpty()
+    .withMessage("Current password is required"),
+
+  body("newPassword")
+    .isString()
+    .withMessage("New password must be a string")
+    .isLength({ min: 8 })
+    .withMessage(
+      "New password must be at least 8 characters long"
+    )
+    .isLength({ max: 128 })
+    .withMessage(
+      "New password cannot exceed 128 characters"
+    ),
+
+  body("confirmPassword")
+    .isString()
+    .withMessage("Confirm password must be a string")
+    .notEmpty()
+    .withMessage("Confirm password is required")
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error("Passwords do not match");
+      }
+
+      return true;
+    }),
+];
+
 
   /*
 |--------------------------------------------------------------------------
